@@ -7,16 +7,54 @@ let end = {x:8,y:7};
 let world = createArray(width,height);
 fill(world,0);
 
-// Mark the start (1) and end (2 positions)
-world[start.x][start.y] = 1;
-world[end.x][end.y] = 2;
+// Create obstacles
+// TODO
 
 // A-STAR
+let path = aStarPath(world,start,end);
+
+// log(path);
+
+function aStarPath(arr,start,end){
+	// Set of nodes already evaluated (currently none)
+	let closedSet = new Array();
+
+	// The set of currently discovered nodes that are not evaluated yet.
+	let openSet = new Array();
+    // Initially, only the start node is known.
+	openSet.push(start);
+
+	// For each node, which node it can most efficiently be reached from.
+	let cameFrom = createArray(arr.length,arr[0].length);
+
+	// The cost of getting to each node
+	// This begins at infinity and will slowly work down
+	let gScore = createArray(arr.length,arr[0].length);
+	fill(gScore,Infinity);
+	// The score of start->start is 0
+	gScore[start.x][start.y] = 0;
+
+	// For each node, the total cost of getting from the start node to the goal
+    // by passing by that node. That value is partly known, partly heuristic.
+    let fScore = createArray(arr.length,arr[0].length);
+	fill(gScore,Infinity);
+	// For the first node, that value is completely heuristic.
+	fScore[start.x][start.y] = heuristicCalculation(start,end);
+
+	// While we still have things to evaluate,
+	// we should.... evaluate them!
+	while(openSet.length>0){
+
+	}
 
 
 
+}
 
-
+function heuristicCalculation(node,target) {
+	// Using manhattan distance, with a cost of 1
+	return Math.abs(node.x - target.x)+Math.abs(node.y - target.y);
+}
 
 // HELPER FUNCTIONS
 function log(x) {
