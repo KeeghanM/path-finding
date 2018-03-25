@@ -1,80 +1,144 @@
-let width = 10;
-let height = 10;
-let start = {x:3,y:4};
-let end = {x:8,y:7};
+class Node {
+  constructor (x, y) {
+    this.x = x
+    this.y = y
+    this.parent = null
 
-// Generate the world array and fill it with 0's (empty)
-let world = createArray(width,height);
-fill(world,0);
+    // G == Cost from start to this node
+    this.g = Infinity
 
-// Create obstacles
-// TODO
+    // H == Heuristic from this node to end
+    this.h = 0
 
-// A-STAR
-let path = aStarPath(world,start,end);
+    // F == total cost to use this node
+    this.f = 0
+    this.calcF()
+  }
 
-// log(path);
-
-function aStarPath(arr,start,end){
-	// Set of nodes already evaluated (currently none)
-	let closedSet = new Array();
-
-	// The set of currently discovered nodes that are not evaluated yet.
-	let openSet = new Array();
-    // Initially, only the start node is known.
-	openSet.push(start);
-
-	// For each node, which node it can most efficiently be reached from.
-	let cameFrom = createArray(arr.length,arr[0].length);
-
-	// The cost of getting to each node
-	// This begins at infinity and will slowly work down
-	let gScore = createArray(arr.length,arr[0].length);
-	fill(gScore,Infinity);
-	// The score of start->start is 0
-	gScore[start.x][start.y] = 0;
-
-	// For each node, the total cost of getting from the start node to the goal
-    // by passing by that node. That value is partly known, partly heuristic.
-    let fScore = createArray(arr.length,arr[0].length);
-	fill(gScore,Infinity);
-	// For the first node, that value is completely heuristic.
-	fScore[start.x][start.y] = heuristicCalculation(start,end);
-
-	// While we still have things to evaluate,
-	// we should.... evaluate them!
-	while(openSet.length>0){
-
-	}
-
-
-
+  calcF () {
+    this.f = this.g + this.h
+  }
+  calcG (start) {
+    // Manhatten distance between the START node and THIS node
+    this.g = Math.abs(start.x - this.x) + Math.abs(start.y - this.y)
+  }
+  calcH (target) {
+    // Manhatten distance between THIS node and the TARGET node
+    this.h = Math.abs(this.x - target.x) + Math.abs(this.y - target.y)
+  }
+  getNeighbours (grid) {
+    let neighbours = []
+    neighbours.push(grid[this.x - 1][this.y])
+    neighbours.push(grid[this.x - 1][this.y - 1])
+    neighbours.push(grid[this.x - 1][this.y + 1])
+    neighbours.push(grid[this.x][this.y - 1])
+    neighbours.push(grid[this.x][this.y + 1])
+    neighbours.push(grid[this.x + 1][this.y])
+    neighbours.push(grid[this.x + 1][this.y - 1])
+    neighbours.push(grid[this.x + 1][this.y + 1])
+    return neighbours
+  }
 }
 
-function heuristicCalculation(node,target) {
-	// Using manhattan distance, with a cost of 1
-	return Math.abs(node.x - target.x)+Math.abs(node.y - target.y);
+class Grid {
+  constructor (w, h) {
+    return this.createArray(w, h)
+  }
+
+  createArray (w, h) {
+	    let arr = new Array(w)
+	    for (var i = 0; i < arr.length; i++) {
+	    	arr[i] = new Array(h)
+	    	for (var j = 0; j < arr[i].length; j++) {
+	    		arr[i][j] = new Node(i, j)
+	    	}
+	    }
+	    return arr
+  }
 }
 
-// HELPER FUNCTIONS
-function log(x) {
-	window.console.log(x);
-}
-function createArray(length) {
-    var arr = new Array(length || 0),
-        i = length;
+class AStarPath {
+  constructor (arr, sx, sy, tx, ty) {
+    this.path = []
+    this.grid = arr
+    this.start = this.grid[sx][sy]
+    this.end = this.grid[tx][ty]
 
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    return this.findPath()
+  }
+
+  findPath () {
+    let found = false
+    let closedSet = []
+    let openSet = []
+
+    this.start.calcG(this.start)
+    this.start.calcH(this.end)
+    this.start.calcF(this.start)
+    openSet.push(this.start)
+
+    while (openSet.length > 0) {
+      let current = this.lowestF(openSet)
+      if (current == this.end) {
+        return this.constructPath()
+      }
+
+      openSet.splice(current)
+      closedSet.push(current)
+
+      for (let n of current.getNeighbours(this.grid)) {
+        // Ignore already checked ones
+        if (closedSet.includes(n)) {
+          continue
+        }
+
+        n.calcH(this.end)
+
+        // Discover new ones
+        if (!openSet.includes(n)) {
+          openSet.push(n)
+        }
+
+        let tempG = current.g + this.getDistance(current, n)
+        if (tempG > n.g) {
+          continue
+        }
+
+        n.parent = current
+        n.g = tempG
+        n.calcF()
+      }
     }
+  }
 
-    return arr;
-}
-function fill(a,x){
-	for (var i = a.length - 1; i >= 0; i--) {
-		for (var j = a[i].length - 1; j >= 0; j--) {
-			a[i][j] = x;
-		}
-	}
+  lowestF (set) {
+    let lowestF = Infinity
+    let lowestNode = null
+    for (let node of set) {
+      if (node.f < lowestF) {
+        lowestF = node.f
+        lowestNode = node
+      }
+    }
+    return lowestNode
+  }
+
+  getDistance (c, n) {
+    return Math.abs(c.x - n.x) + Math.abs(c.y - n.y)
+  }
+
+  constructPath () {
+    let done = false
+    let current = this.end
+    this.path.push(current)
+
+    while (!done) {
+      current = current.parent
+      this.path.push(current)
+      if (current == this.start) {
+        done = true
+      }
+    }
+    return this.path
+  }
 }
