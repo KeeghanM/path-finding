@@ -49,7 +49,3 @@ function mousePressed () {
   window.console.log(end)
   path = new AStarPath(world, start.x, start.y, end.x, end.y)
 }
-
-function clamp (num, min, max) {
-  return num <= min ? min : num >= max ? max : num
-}
