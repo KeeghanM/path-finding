@@ -6,4 +6,7 @@ They are purely experimental in nature, probably highly inefficient and built pu
 
 Current Algorithms
 ---------------
-A* => In Progress
+A* => Working State
+	Things to Do: 
+		- Add different heuristics
+		- Add diagonal cost weighting
