@@ -3,6 +3,7 @@ class Node {
     this.x = x
     this.y = y
     this.parent = null
+    this.obstacle = false
 
     // G == Cost from start to this node
     this.g = Infinity
@@ -28,21 +29,30 @@ class Node {
   }
   getNeighbours (grid) {
     let neighbours = []
-    neighbours.push(grid[this.x - 1][this.y])
-    neighbours.push(grid[this.x - 1][this.y - 1])
-    neighbours.push(grid[this.x - 1][this.y + 1])
-    neighbours.push(grid[this.x][this.y - 1])
-    neighbours.push(grid[this.x][this.y + 1])
-    neighbours.push(grid[this.x + 1][this.y])
-    neighbours.push(grid[this.x + 1][this.y - 1])
-    neighbours.push(grid[this.x + 1][this.y + 1])
+	let rowLimit = grid.length-1;
+	let columnLimit = grid[0].length-1;
+
+	let i = this.x
+	let j = this.y
+
+	for(var x = Math.max(0, i-1); x <= Math.min(i+1, rowLimit); x++) {
+	    for(var y = Math.max(0, j-1); y <= Math.min(j+1, columnLimit); y++) {
+	      if(x !== i || y !== j) {
+	        neighbours.push(grid[x][y])
+	      }
+	    }
+	  }
+
     return neighbours
+  }
+  setObstacle(bool) {
+	this.obstacle = bool
   }
 }
 
 class Grid {
   constructor (w, h) {
-    return this.createArray(w, h)
+    this.grid = this.createArray(w, h)
   }
 
   createArray (w, h) {
@@ -54,6 +64,14 @@ class Grid {
 	    	}
 	    }
 	    return arr
+  }
+
+  createObstacles(x){
+  	for (var i = 0; i < x; i++) {
+  		let randX = Math.floor(Math.random() * this.grid.length)
+  		let randY = Math.floor(Math.random() * this.grid[randX].length)
+  		this.grid[randX][randY].setObstacle(true)
+  	}
   }
 }
 
@@ -79,6 +97,7 @@ class AStarPath {
 
     while (openSet.length > 0) {
       let current = this.lowestF(openSet)
+
       if (current == this.end) {
         return this.constructPath()
       }
@@ -100,6 +119,9 @@ class AStarPath {
         }
 
         let tempG = current.g + this.getDistance(current, n)
+        if(n.obstacle){
+        	tempG = Infinity
+        }
         if (tempG > n.g) {
           continue
         }
@@ -115,7 +137,7 @@ class AStarPath {
     let lowestF = Infinity
     let lowestNode = null
     for (let node of set) {
-      if (node.f < lowestF) {
+      if (node.f <= lowestF) {
         lowestF = node.f
         lowestNode = node
       }

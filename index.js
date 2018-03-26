@@ -10,9 +10,11 @@ function setup () {
   end = new Node(8, 8)
 
   // Generate the world array and fill it with 0's (empty)
-  world = new Grid(worldWidth, worldHeight) // TODO: Add Obstacles
+  world = new Grid(worldWidth, worldHeight)
+  world.createObstacles(10)
+
   // Calculate Path
-  path = new AStarPath(world, start.x, start.y, end.x, end.y)
+  path = new AStarPath(world.grid, start.x, start.y, end.x, end.y)
 
   createCanvas(400, 400)
   background('#aaa')
@@ -20,12 +22,15 @@ function setup () {
 }
 
 function draw () {
-  for (var i = 0; i < world.length; i++) {
-    for (var j = 0; j < world[i].length; j++) {
-      let node = world[i][j]
+  for (var i = 0; i < world.grid.length; i++) {
+    for (var j = 0; j < world.grid[i].length; j++) {
+      let node = world.grid[i][j]
       stroke(0)
       strokeWeight(3)
       fill(255)
+      if (node.obstacle){
+        fill(0)
+      }
       if (node.x == start.x && node.y == start.y) {
         fill(0, 255, 0)
       }
@@ -46,5 +51,5 @@ function mousePressed () {
   let x = Math.round(winMouseX / cellSize) - 1
   let y = Math.round(winMouseY / cellSize) - 1
   end = new Node(x, y)
-  path = new AStarPath(world, start.x, start.y, end.x, end.y)
+  path = new AStarPath(world.grid, start.x, start.y, end.x, end.y)
 }
