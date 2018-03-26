@@ -46,6 +46,5 @@ function mousePressed () {
   let x = Math.round(winMouseX / cellSize) - 1
   let y = Math.round(winMouseY / cellSize) - 1
   end = new Node(x, y)
-  window.console.log(end)
   path = new AStarPath(world, start.x, start.y, end.x, end.y)
 }
