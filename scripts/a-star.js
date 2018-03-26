@@ -29,43 +29,20 @@ class Node {
   }
   getNeighbours (grid) {
     let neighbours = []
-    let width = grid.length
-    let height = grid[0].length
+	let rowLimit = grid.length-1;
+	let columnLimit = grid[0].length-1;
 
-    let north = grid[this.x][this.y - 1]
-    let northEast = grid[this.x + 1][this.y - 1]
-    let northWest = grid[this.x - 1][this.y - 1]
-    let east = grid[this.x + 1][this.y]
-    let west = grid[this.x - 1][this.y]
-    let south = grid[this.x][this.y + 1]
-    let southEast = grid[this.x + 1][this.y + 1]
-    let southWest = grid[this.x - 1][this.y + 1]
+	let i = this.x
+	let j = this.y
 
-    if(north){
-    	neighbours.push(north)
-    }
-    if(northEast){
-    	neighbours.push(northEast)
-    }
-    if(northWest){
-    	neighbours.push(northWest)
-    }
-    if(east){
-    	neighbours.push(east)
-    }
-    if(west){
-    	neighbours.push(west)
-    }
-    if(south){
-    	neighbours.push(south)
-    }
-    if(southEast){
-    	neighbours.push(southEast)
-    }
-    if(southWest){
-    	neighbours.push(southWest)
-    }
-    
+	for(var x = Math.max(0, i-1); x <= Math.min(i+1, rowLimit); x++) {
+	    for(var y = Math.max(0, j-1); y <= Math.min(j+1, columnLimit); y++) {
+	      if(x !== i || y !== j) {
+	        neighbours.push(grid[x][y])
+	      }
+	    }
+	  }
+
     return neighbours
   }
   setObstacle(bool) {
@@ -120,9 +97,7 @@ class AStarPath {
 
     while (openSet.length > 0) {
       let current = this.lowestF(openSet)
-      // if(current.obstacle){
-      // 	continue
-      // }
+
       if (current == this.end) {
         return this.constructPath()
       }
@@ -130,10 +105,8 @@ class AStarPath {
       openSet.splice(current)
       closedSet.push(current)
 
-      window.console.log(current)
       for (let n of current.getNeighbours(this.grid)) {
         // Ignore already checked ones
-        window.console.log(n)
         if (closedSet.includes(n)) {
           continue
         }
@@ -146,7 +119,10 @@ class AStarPath {
         }
 
         let tempG = current.g + this.getDistance(current, n)
-        if (tempG > n.g || n.obstacle == true) {
+        if(n.obstacle){
+        	tempG = Infinity
+        }
+        if (tempG > n.g) {
           continue
         }
 
@@ -161,7 +137,7 @@ class AStarPath {
     let lowestF = Infinity
     let lowestNode = null
     for (let node of set) {
-      if (node.f < lowestF) {
+      if (node.f <= lowestF) {
         lowestF = node.f
         lowestNode = node
       }
