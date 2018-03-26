@@ -3,6 +3,7 @@ class Node {
     this.x = x
     this.y = y
     this.parent = null
+    this.obstacle = false
 
     // G == Cost from start to this node
     this.g = Infinity
@@ -28,6 +29,9 @@ class Node {
   }
   getNeighbours (grid) {
     let neighbours = []
+    let width = grid.length
+    let height = grid[0].length
+
     neighbours.push(grid[this.x - 1][this.y])
     neighbours.push(grid[this.x - 1][this.y - 1])
     neighbours.push(grid[this.x - 1][this.y + 1])
@@ -38,11 +42,14 @@ class Node {
     neighbours.push(grid[this.x + 1][this.y + 1])
     return neighbours
   }
+  setObstacle(bool) {
+	this.obstacle = bool
+  }
 }
 
 class Grid {
   constructor (w, h) {
-    return this.createArray(w, h)
+    this.grid = this.createArray(w, h)
   }
 
   createArray (w, h) {
@@ -54,6 +61,14 @@ class Grid {
 	    	}
 	    }
 	    return arr
+  }
+
+  createObstacles(x){
+  	for (var i = 0; i < x; i++) {
+  		let randX = Math.floor(Math.random() * this.grid.length)
+  		let randY = Math.floor(Math.random() * this.grid[randX].length)
+  		this.grid[randX][randY].setObstacle(true)
+  	}
   }
 }
 
@@ -79,6 +94,9 @@ class AStarPath {
 
     while (openSet.length > 0) {
       let current = this.lowestF(openSet)
+      // if(current.obstacle){
+      // 	continue
+      // }
       if (current == this.end) {
         return this.constructPath()
       }
@@ -86,8 +104,10 @@ class AStarPath {
       openSet.splice(current)
       closedSet.push(current)
 
+      window.console.log(current)
       for (let n of current.getNeighbours(this.grid)) {
         // Ignore already checked ones
+        window.console.log(n)
         if (closedSet.includes(n)) {
           continue
         }
@@ -100,7 +120,7 @@ class AStarPath {
         }
 
         let tempG = current.g + this.getDistance(current, n)
-        if (tempG > n.g) {
+        if (tempG > n.g || n.obstacle == true) {
           continue
         }
 
