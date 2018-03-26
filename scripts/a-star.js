@@ -32,14 +32,40 @@ class Node {
     let width = grid.length
     let height = grid[0].length
 
-    neighbours.push(grid[this.x - 1][this.y])
-    neighbours.push(grid[this.x - 1][this.y - 1])
-    neighbours.push(grid[this.x - 1][this.y + 1])
-    neighbours.push(grid[this.x][this.y - 1])
-    neighbours.push(grid[this.x][this.y + 1])
-    neighbours.push(grid[this.x + 1][this.y])
-    neighbours.push(grid[this.x + 1][this.y - 1])
-    neighbours.push(grid[this.x + 1][this.y + 1])
+    let north = grid[this.x][this.y - 1]
+    let northEast = grid[this.x + 1][this.y - 1]
+    let northWest = grid[this.x - 1][this.y - 1]
+    let east = grid[this.x + 1][this.y]
+    let west = grid[this.x - 1][this.y]
+    let south = grid[this.x][this.y + 1]
+    let southEast = grid[this.x + 1][this.y + 1]
+    let southWest = grid[this.x - 1][this.y + 1]
+
+    if(north){
+    	neighbours.push(north)
+    }
+    if(northEast){
+    	neighbours.push(northEast)
+    }
+    if(northWest){
+    	neighbours.push(northWest)
+    }
+    if(east){
+    	neighbours.push(east)
+    }
+    if(west){
+    	neighbours.push(west)
+    }
+    if(south){
+    	neighbours.push(south)
+    }
+    if(southEast){
+    	neighbours.push(southEast)
+    }
+    if(southWest){
+    	neighbours.push(southWest)
+    }
+    
     return neighbours
   }
   setObstacle(bool) {
