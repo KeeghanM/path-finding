@@ -4,7 +4,7 @@ let start = new Node(1, 1)
 let end
 let cellSize
 
-function setup () {
+function setup() {
   let worldWidth = 10
   let worldHeight = 10
   end = new Node(8, 8)
@@ -21,14 +21,14 @@ function setup () {
   cellSize = width / worldWidth
 }
 
-function draw () {
+function draw() {
   for (var i = 0; i < world.grid.length; i++) {
     for (var j = 0; j < world.grid[i].length; j++) {
       let node = world.grid[i][j]
       stroke(0)
       strokeWeight(3)
       fill(255)
-      if (node.obstacle){
+      if (node.obstacle) {
         fill(0)
       }
       if (node.x == start.x && node.y == start.y) {
@@ -47,7 +47,7 @@ function draw () {
   }
 }
 
-function mousePressed () {
+function mousePressed() {
   let x = Math.round(winMouseX / cellSize) - 1
   let y = Math.round(winMouseY / cellSize) - 1
   end = new Node(x, y)
